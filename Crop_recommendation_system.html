@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Crop Recommendation System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-1: #b7e4b7;
+    --green-2: #c8edca;
+    --green-3: #d9f2da;
+    --green-4: #eaf8eb;
+    --green-5: #f4fbf4;
+    --green-dark: #2e7d4f;
+    --green-mid: #3ea66a;
+    --green-accent: #4caf78;
+    --green-border: #a8d8a8;
+    --green-soft: #7cc47c;
+    --text-dark: #1a3d2b;
+    --text-mid: #2e6647;
+    --text-light: #5a9070;
+    --white: #ffffff;
+    --shadow: rgba(46,125,79,0.12);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(180deg,
+      #b7e4b7 0%,
+      #c8edca 25%,
+      #d9f2da 50%,
+      #eaf8eb 75%,
+      #f4fbf4 100%);
+    background-attachment: fixed;
+    color: var(--text-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .page-wrapper {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 44px 20px 70px;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .logo-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.75);
+    border: 1.5px solid var(--green-border);
+    border-radius: 50px;
+    padding: 9px 20px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--green-dark);
+  }
+
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 50px);
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--text-dark);
+    margin-bottom: 14px;
+    letter-spacing: -0.5px;
+  }
+
+  .header h1 span { color: var(--green-mid); }
+
+  .header p {
+    font-size: 15px;
+    color: var(--text-light);
+    max-width: 440px;
+    margin: 0 auto;
+    line-height: 1.65;
+  }
+
+  .header-badges {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+
+  .h-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--green-border);
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-mid);
+  }
+
+  .h-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green-accent);
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.15s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .stat-card {
+    background: rgba(255,255,255,0.72);
+    border: 1.5px solid var(--green-border);
+    border-radius: 18px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--shadow);
+  }
+
+  .stat-icon {
+    width: 46px; height: 46px;
+    background: linear-gradient(135deg, var(--green-3), var(--green-2));
+    border: 1.5px solid var(--green-border);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--green-dark);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-light);
+    font-weight: 500;
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  /* MAIN CARD */
+  .main-card {
+    background: rgba(255,255,255,0.8);
+    border: 1.5px solid var(--green-border);
+    border-radius: 26px;
+    overflow: hidden;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 10px 40px var(--shadow);
+    animation: fadeUp 0.6s 0.25s ease both;
+  }
+
+  .card-header {
+    padding: 26px 30px 22px;
+    background: linear-gradient(135deg, rgba(183,228,183,0.55), rgba(200,237,202,0.3));
+    border-bottom: 1.5px solid var(--green-border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .card-header-icon {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+    border-radius: 15px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(46,125,79,0.3);
+  }
+
+  .card-header-text h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text-dark);
+  }
+
+  .card-header-text p {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-top: 3px;
+  }
+
+  .card-body { padding: 30px; }
+
+  /* SECTION LABELS */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--green-mid);
+    margin-bottom: 14px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1.5px;
+    background: linear-gradient(90deg, var(--green-border), transparent);
+    border-radius: 2px;
+  }
+
+  /* INPUT GRID */
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .input-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    color: var(--text-mid);
+    margin-bottom: 7px;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255,255,255,0.85);
+    border: 1.5px solid var(--green-border);
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    color: var(--text-dark);
+    transition: all 0.22s;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(46,125,79,0.07);
+  }
+
+  .input-group input::placeholder {
+    color: #aad0aa;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+  }
+
+  .input-group input:focus {
+    border-color: var(--green-mid);
+    box-shadow: 0 0 0 3px rgba(62,166,106,0.15), 0 2px 8px var(--shadow);
+    background: #fff;
+  }
+
+  .input-hint {
+    font-size: 10px;
+    color: var(--text-light);
+    margin-top: 5px;
+    opacity: 0.8;
+  }
+
+  .span-full { grid-column: 1 / -1; }
+
+  /* PREDICT BUTTON */
+  .predict-btn {
+    width: 100%;
+    padding: 17px;
+    background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+    border: none;
+    border-radius: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.28s;
+    box-shadow: 0 4px 18px rgba(46,125,79,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .predict-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+    transition: left 0.5s;
+  }
+
+  .predict-btn:hover::before { left: 100%; }
+
+  .predict-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(46,125,79,0.38);
+  }
+
+  .predict-btn:active { transform: translateY(0); }
+
+  .btn-inner { display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+  /* RESULT PANEL */
+  .result-panel {
+    display: none;
+    margin-top: 26px;
+    animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(28px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .result-inner {
+    background: linear-gradient(135deg, rgba(183,228,183,0.45), rgba(244,251,244,0.6));
+    border: 1.5px solid var(--green-border);
+    border-radius: 20px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+
+  .result-inner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green-mid), var(--green-accent), var(--green-soft));
+    border-radius: 3px 3px 0 0;
+  }
+
+  .result-top {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 22px;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .crop-badge {
+    width: 84px; height: 84px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), var(--green-4));
+    border: 2px solid var(--green-border);
+    border-radius: 22px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 20px rgba(46,125,79,0.15);
+    flex-shrink: 0;
+  }
+
+  .crop-emoji { font-size: 38px; }
+
+  .result-tag {
+    display: inline-block;
+    background: rgba(62,166,106,0.12);
+    border: 1px solid rgba(62,166,106,0.3);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--green-mid);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .crop-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .crop-subtitle {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-top: 5px;
+  }
+
+  .conf-section { margin-bottom: 22px; }
+
+  .conf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 9px;
+  }
+
+  .conf-label-text {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-light);
+  }
+
+  .conf-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--green-dark);
+  }
+
+  .conf-track {
+    height: 9px;
+    background: rgba(46,125,79,0.1);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .conf-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-mid), var(--green-accent));
+    border-radius: 20px;
+    width: 0;
+    transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .tip-box {
+    background: rgba(255,255,255,0.65);
+    border: 1.5px solid var(--green-border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .tip-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--green-3), var(--green-2));
+    border: 1.5px solid var(--green-border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .tip-content strong {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--green-mid);
+    margin-bottom: 4px;
+  }
+
+  .tip-content p {
+    font-size: 13.5px;
+    color: var(--text-dark);
+    line-height: 1.6;
+  }
+
+  /* INFO GRID */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 26px;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+
+  .info-card {
+    background: rgba(255,255,255,0.72);
+    border: 1.5px solid var(--green-border);
+    border-radius: 18px;
+    padding: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 14px var(--shadow);
+    transition: transform 0.22s, box-shadow 0.22s;
+  }
+
+  .info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px var(--shadow);
+  }
+
+  .info-card-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--green-3), var(--green-2));
+    border: 1.5px solid var(--green-border);
+    border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .info-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+
+  .info-card p {
+    font-size: 12px;
+    color: var(--text-light);
+    line-height: 1.55;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    margin-top: 44px;
+    font-size: 12px;
+    color: var(--text-light);
+    opacity: 0.7;
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .input-grid { grid-template-columns: 1fr 1fr; }
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+    .result-top { grid-template-columns: 1fr; text-align: center; }
+    .crop-badge { margin: 0 auto; }
+    .card-body { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Smart Crop<br><span>Recommendation System</span></h1>
+    <p>Enter your soil & climate conditions. Our ML model powered by IBM watsonx.ai will predict the optimal crop for your farm.</p>
+    <div class="header-badges">
+      <div class="h-badge"><div class="dot"></div> Random Forest ML</div>
+      <div class="h-badge"><div class="dot"></div> IBM watsonx.ai</div>
+      <div class="h-badge"><div class="dot"></div> 11 Crop Types</div>
+    </div>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-icon">🌱</div>
+      <div>
+        <div class="stat-value">2200+</div>
+        <div class="stat-label">Training Samples</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⚙️</div>
+      <div>
+        <div class="stat-value">7</div>
+        <div class="stat-label">Input Parameters</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="main-card">
+    <div class="card-header">
+      <div class="card-header-icon">🧪</div>
+      <div class="card-header-text">
+        <h2>Soil & Climate Parameters</h2>
+        <p>Fill in your field measurements for an accurate prediction</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+
+      <div class="section-label">Soil Nutrients (kg/ha)</div>
+      <div class="input-grid">
+        <div class="input-group">
+          <label>🅽 Nitrogen (N)</label>
+          <input type="number" id="N" placeholder="e.g. 90" min="0" max="140">
+          <div class="input-hint">Range: 0 – 140 kg/ha</div>
+        </div>
+        <div class="input-group">
+          <label>🅿 Phosphorus (P)</label>
+          <input type="number" id="P" placeholder="e.g. 42" min="5" max="145">
+          <div class="input-hint">Range: 5 – 145 kg/ha</div>
+        </div>
+        <div class="input-group">
+          <label>🅺 Potassium (K)</label>
+          <input type="number" id="K" placeholder="e.g. 43" min="5" max="205">
+          <div class="input-hint">Range: 5 – 205 kg/ha</div>
+        </div>
+      </div>
+
+      <div class="section-label">Environmental Conditions</div>
+      <div class="input-grid">
+        <div class="input-group">
+          <label>🌡️ Temperature (°C)</label>
+          <input type="number" id="temperature" placeholder="e.g. 20.8" step="0.1" min="8" max="44">
+          <div class="input-hint">Range: 8 – 44 °C</div>
+        </div>
+        <div class="input-group">
+          <label>💧 Humidity (%)</label>
+          <input type="number" id="humidity" placeholder="e.g. 82" step="0.1" min="14" max="100">
+          <div class="input-hint">Range: 14 – 100 %</div>
+        </div>
+        <div class="input-group">
+          <label>⚗️ pH Level</label>
+          <input type="number" id="ph" placeholder="e.g. 6.5" step="0.1" min="3.5" max="9.5">
+          <div class="input-hint">Range: 3.5 – 9.5</div>
+        </div>
+        <div class="input-group span-full">
+          <label>🌧️ Rainfall (mm)</label>
+          <input type="number" id="rainfall" placeholder="e.g. 202" step="0.1" min="20" max="300">
+          <div class="input-hint">Range: 20 – 300 mm/year</div>
+        </div>
+      </div>
+
+      <button class="predict-btn" onclick="predict()">
+        <div class="btn-inner">
+          <span>🌱</span>
+          <span>Analyze &amp; Recommend Crop</span>
+          <span>→</span>
+        </div>
+      </button>
+
+      <!-- Result Panel -->
+      <div class="result-panel" id="result">
+        <div class="result-inner">
+          <div class="result-top">
+            <div class="crop-badge">
+              <div class="crop-emoji" id="crop-emoji">🌱</div>
+            </div>
+            <div class="result-meta">
+              <div class="result-tag">ML Prediction</div>
+              <div class="crop-name" id="crop-name">—</div>
+              <div class="crop-subtitle" id="crop-subtitle">Best suited crop for your conditions</div>
+            </div>
+          </div>
+
+          <div class="conf-section">
+            <div class="conf-header">
+              <span class="conf-label-text">Model Confidence</span>
+              <span class="conf-value" id="conf-label">—</span>
+            </div>
+            <div class="conf-track">
+              <div class="conf-fill" id="conf-bar"></div>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-content">
+              <strong>Agronomic Tip</strong>
+              <p id="tip-text">—</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Info Cards -->
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-icon">🌿</div>
+      <div>
+        <h4>How It Works</h4>
+        <p>Our k-NN model finds the 5 closest matches using weighted Euclidean distance and votes for the best crop.</p>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon">⚙️</div>
+      <div>
+        <h4>Key Factors</h4>
+        <p>pH carries the highest weight (3×), followed by temperature (2×) and humidity (1.5×) in prediction.</p>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon">🔬</div>
+      <div>
+        <h4>Data Source</h4>
+        <p>Trained on real agricultural data covering 11 crops across diverse soil types and climate conditions.</p>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon">🛰️</div>
+      <div>
+        <h4>IBM watsonx.ai</h4>
+        <p>Model pipeline built on IBM's enterprise-grade AI platform for reliability and accuracy at scale.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Smart Crop Recommendation System &middot; Powered by IBM watsonx.ai &amp; Random Forest ML
+  </div>
+
+</div>
+
+<script>
+var cropEmojis = {
+  rice:"🌾", maize:"🌽", chickpea:"🫘", kidneybeans:"🫘",
+  pigeonpeas:"🌿", mothbeans:"🌱", mungbean:"🌱", blackgram:"⚫",
+  lentil:"🟤", banana:"🍌", pomegranate:"🍎"
+};
+
+var samples = [{"N":49,"P":73,"K":125,"temperature":19.0,"humidity":93.6,"ph":6.2,"rainfall":278.7,"crop":"lentil","conf":51.0},{"N":38,"P":55,"K":109,"temperature":32.0,"humidity":91.3,"ph":6.3,"rainfall":113.3,"crop":"pigeonpeas","conf":22.0},{"N":96,"P":31,"K":176,"temperature":37.2,"humidity":94.5,"ph":6.4,"rainfall":223.3,"crop":"rice","conf":32.0},{"N":77,"P":34,"K":97,"temperature":20.4,"humidity":57.9,"ph":7.5,"rainfall":125.9,"crop":"maize","conf":39.5},{"N":71,"P":31,"K":108,"temperature":28.4,"humidity":79.4,"ph":7.7,"rainfall":291.3,"crop":"pomegranate","conf":25.0},{"N":61,"P":53,"K":151,"temperature":24.3,"humidity":87.2,"ph":6.4,"rainfall":43.7,"crop":"lentil","conf":50.0},{"N":92,"P":50,"K":199,"temperature":37.8,"humidity":81.7,"ph":4.5,"rainfall":168.3,"crop":"lentil","conf":36.5},{"N":42,"P":40,"K":204,"temperature":25.8,"humidity":89.8,"ph":5.2,"rainfall":187.6,"crop":"lentil","conf":50.0},{"N":30,"P":34,"K":157,"temperature":28.8,"humidity":58.2,"ph":5.6,"rainfall":172.1,"crop":"lentil","conf":34.0},{"N":62,"P":31,"K":95,"temperature":31.2,"humidity":83.3,"ph":6.4,"rainfall":251.8,"crop":"pomegranate","conf":32.5},{"N":69,"P":38,"K":172,"temperature":31.1,"humidity":66.5,"ph":4.8,"rainfall":247.5,"crop":"lentil","conf":33.0},{"N":40,"P":61,"K":79,"temperature":25.0,"humidity":62.6,"ph":5.2,"rainfall":199.3,"crop":"maize","conf":39.0},{"N":84,"P":41,"K":139,"temperature":19.7,"humidity":82.1,"ph":5.0,"rainfall":78.9,"crop":"lentil","conf":34.5},{"N":4,"P":30,"K":197,"temperature":40.2,"humidity":76.6,"ph":5.9,"rainfall":223.4,"crop":"kidneybeans","conf":40.5},{"N":35,"P":58,"K":78,"temperature":38.4,"humidity":90.8,"ph":6.6,"rainfall":286.9,"crop":"pomegranate","conf":35.0},{"N":74,"P":42,"K":133,"temperature":29.8,"humidity":80.6,"ph":7.0,"rainfall":295.4,"crop":"lentil","conf":32.0},{"N":45,"P":30,"K":101,"temperature":32.7,"humidity":74.5,"ph":6.7,"rainfall":259.7,"crop":"kidneybeans","conf":25.0},{"N":31,"P":26,"K":205,"temperature":24.5,"humidity":83.2,"ph":5.8,"rainfall":84.3,"crop":"lentil","conf":49.5},{"N":54,"P":28,"K":43,"temperature":36.8,"humidity":89.2,"ph":5.3,"rainfall":252.5,"crop":"banana","conf":43.0},{"N":81,"P":59,"K":172,"temperature":34.3,"humidity":56.1,"ph":6.7,"rainfall":197.6,"crop":"lentil","conf":36.0},{"N":73,"P":32,"K":118,"temperature":20.2,"humidity":88.4,"ph":4.9,"rainfall":197.4,"crop":"banana","conf":40.0},{"N":24,"P":36,"K":201,"temperature":21.0,"humidity":63.4,"ph":7.3,"rainfall":283.6,"crop":"lentil","conf":29.5},{"N":2,"P":59,"K":126,"temperature":32.9,"humidity":88.4,"ph":4.7,"rainfall":58.7,"crop":"lentil","conf":32.0},{"N":38,"P":47,"K":129,"temperature":22.3,"humidity":75.1,"ph":4.6,"rainfall":66.2,"crop":"lentil","conf":51.0},{"N":50,"P":37,"K":84,"temperature":26.6,"humidity":84.3,"ph":7.4,"rainfall":278.8,"crop":"pigeonpeas","conf":33.0},{"N":21,"P":69,"K":190,"temperature":22.9,"humidity":85.7,"ph":7.3,"rainfall":81.1,"crop":"lentil","conf":40.0},{"N":20,"P":46,"K":153,"temperature":24.0,"humidity":78.9,"ph":6.0,"rainfall":85.5,"crop":"lentil","conf":57.0},{"N":60,"P":68,"K":122,"temperature":39.6,"humidity":90.0,"ph":7.7,"rainfall":208.7,"crop":"lentil","conf":32.0},{"N":49,"P":67,"K":82,"temperature":21.7,"humidity":82.6,"ph":6.1,"rainfall":60.6,"crop":"mungbean","conf":43.0},{"N":94,"P":27,"K":157,"temperature":24.7,"humidity":64.6,"ph":7.8,"rainfall":131.6,"crop":"lentil","conf":33.0},{"N":36,"P":68,"K":109,"temperature":32.2,"humidity":90.7,"ph":7.5,"rainfall":74.4,"crop":"mungbean","conf":28.0},{"N":39,"P":49,"K":209,"temperature":27.9,"humidity":81.0,"ph":4.5,"rainfall":90.0,"crop":"lentil","conf":60.5},{"N":42,"P":35,"K":79,"temperature":23.4,"humidity":72.9,"ph":7.0,"rainfall":215.2,"crop":"rice","conf":20.5},{"N":53,"P":27,"K":120,"temperature":38.9,"humidity":77.7,"ph":7.2,"rainfall":224.3,"crop":"pigeonpeas","conf":25.0},{"N":21,"P":53,"K":34,"temperature":24.2,"humidity":61.3,"ph":6.3,"rainfall":166.7,"crop":"maize","conf":41.0},{"N":71,"P":63,"K":18,"temperature":39.2,"humidity":74.8,"ph":5.6,"rainfall":161.4,"crop":"maize","conf":17.0},{"N":53,"P":37,"K":158,"temperature":42.0,"humidity":80.3,"ph":4.8,"rainfall":228.6,"crop":"lentil","conf":44.0},{"N":1,"P":50,"K":191,"temperature":28.0,"humidity":55.1,"ph":4.6,"rainfall":236.2,"crop":"lentil","conf":29.5},{"N":86,"P":58,"K":174,"temperature":20.3,"humidity":59.8,"ph":6.8,"rainfall":267.1,"crop":"lentil","conf":28.0},{"N":35,"P":69,"K":64,"temperature":20.4,"humidity":89.2,"ph":5.9,"rainfall":61.1,"crop":"mungbean","conf":40.5},{"N":35,"P":53,"K":47,"temperature":38.7,"humidity":60.3,"ph":6.3,"rainfall":209.2,"crop":"maize","conf":24.5},{"N":44,"P":32,"K":57,"temperature":24.7,"humidity":55.7,"ph":4.6,"rainfall":217.1,"crop":"banana","conf":27.0},{"N":71,"P":45,"K":111,"temperature":40.5,"humidity":91.4,"ph":4.6,"rainfall":234.8,"crop":"banana","conf":33.5},{"N":89,"P":63,"K":185,"temperature":29.9,"humidity":80.8,"ph":6.1,"rainfall":153.2,"crop":"lentil","conf":57.5},{"N":68,"P":36,"K":71,"temperature":27.0,"humidity":66.6,"ph":5.0,"rainfall":110.6,"crop":"maize","conf":41.0},{"N":43,"P":75,"K":112,"temperature":35.2,"humidity":68.5,"ph":6.7,"rainfall":50.7,"crop":"mungbean","conf":43.5},{"N":20,"P":34,"K":167,"temperature":24.9,"humidity":70.8,"ph":6.4,"rainfall":116.3,"crop":"lentil","conf":47.0},{"N":61,"P":71,"K":79,"temperature":40.4,"humidity":67.3,"ph":7.5,"rainfall":229.5,"crop":"maize","conf":33.5},{"N":38,"P":50,"K":102,"temperature":25.2,"humidity":59.3,"ph":6.5,"rainfall":165.1,"crop":"maize","conf":42.0},{"N":43,"P":46,"K":49,"temperature":29.5,"humidity":83.0,"ph":6.0,"rainfall":118.5,"crop":"pigeonpeas","conf":20.0},{"N":94,"P":68,"K":57,"temperature":40.1,"humidity":80.1,"ph":5.8,"rainfall":293.4,"crop":"pomegranate","conf":54.5},{"N":81,"P":30,"K":34,"temperature":37.4,"humidity":62.9,"ph":5.3,"rainfall":140.1,"crop":"maize","conf":39.0},{"N":12,"P":50,"K":160,"temperature":30.5,"humidity":72.9,"ph":6.2,"rainfall":192.1,"crop":"lentil","conf":46.0},{"N":86,"P":38,"K":126,"temperature":20.0,"humidity":63.8,"ph":8.0,"rainfall":192.2,"crop":"maize","conf":34.5},{"N":21,"P":52,"K":67,"temperature":26.6,"humidity":57.6,"ph":7.5,"rainfall":222.5,"crop":"chickpea","conf":35.0},{"N":67,"P":53,"K":210,"temperature":34.2,"humidity":59.8,"ph":5.9,"rainfall":93.9,"crop":"lentil","conf":35.5},{"N":5,"P":38,"K":177,"temperature":21.5,"humidity":62.9,"ph":5.8,"rainfall":182.1,"crop":"kidneybeans","conf":32.5},{"N":19,"P":31,"K":170,"temperature":41.6,"humidity":60.9,"ph":5.9,"rainfall":216.8,"crop":"lentil","conf":30.5},{"N":66,"P":56,"K":191,"temperature":40.0,"humidity":67.9,"ph":6.2,"rainfall":169.6,"crop":"lentil","conf":42.0},{"N":85,"P":37,"K":156,"temperature":32.6,"humidity":63.8,"ph":5.7,"rainfall":290.3,"crop":"lentil","conf":28.5},{"N":40,"P":45,"K":27,"temperature":30.6,"humidity":90.0,"ph":6.6,"rainfall":80.5,"crop":"mungbean","conf":29.5},{"N":48,"P":62,"K":93,"temperature":35.2,"humidity":87.3,"ph":4.7,"rainfall":62.0,"crop":"mungbean","conf":23.0},{"N":5,"P":29,"K":75,"temperature":21.1,"humidity":67.0,"ph":7.2,"rainfall":156.6,"crop":"kidneybeans","conf":32.0},{"N":20,"P":34,"K":185,"temperature":29.1,"humidity":69.9,"ph":5.8,"rainfall":177.7,"crop":"lentil","conf":39.0},{"N":4,"P":61,"K":41,"temperature":34.3,"humidity":87.2,"ph":7.2,"rainfall":297.5,"crop":"kidneybeans","conf":28.5},{"N":95,"P":52,"K":70,"temperature":25.0,"humidity":91.0,"ph":6.0,"rainfall":292.9,"crop":"pomegranate","conf":85.5},{"N":49,"P":63,"K":168,"temperature":23.6,"humidity":89.6,"ph":4.6,"rainfall":270.2,"crop":"lentil","conf":47.0},{"N":94,"P":36,"K":95,"temperature":30.2,"humidity":65.2,"ph":4.7,"rainfall":263.6,"crop":"pomegranate","conf":29.0},{"N":38,"P":74,"K":122,"temperature":27.2,"humidity":70.3,"ph":5.1,"rainfall":283.2,"crop":"lentil","conf":37.5},{"N":30,"P":43,"K":204,"temperature":37.9,"humidity":57.2,"ph":4.6,"rainfall":148.6,"crop":"lentil","conf":34.5},{"N":80,"P":29,"K":29,"temperature":39.6,"humidity":56.6,"ph":5.4,"rainfall":46.9,"crop":"blackgram","conf":59.5},{"N":54,"P":61,"K":126,"temperature":40.1,"humidity":92.4,"ph":6.0,"rainfall":65.8,"crop":"lentil","conf":49.5},{"N":44,"P":47,"K":63,"temperature":18.2,"humidity":94.0,"ph":7.4,"rainfall":58.3,"crop":"mungbean","conf":23.0},{"N":18,"P":38,"K":18,"temperature":22.9,"humidity":82.0,"ph":7.8,"rainfall":72.0,"crop":"mungbean","conf":32.0},{"N":0,"P":43,"K":112,"temperature":34.5,"humidity":92.3,"ph":5.3,"rainfall":76.9,"crop":"kidneybeans","conf":34.5},{"N":58,"P":32,"K":140,"temperature":26.3,"humidity":93.4,"ph":5.0,"rainfall":291.3,"crop":"lentil","conf":33.0},{"N":46,"P":46,"K":139,"temperature":41.1,"humidity":66.9,"ph":7.6,"rainfall":183.8,"crop":"lentil","conf":35.5},{"N":41,"P":36,"K":169,"temperature":41.8,"humidity":59.1,"ph":6.5,"rainfall":80.7,"crop":"lentil","conf":35.5},{"N":18,"P":33,"K":75,"temperature":25.6,"humidity":64.7,"ph":7.1,"rainfall":115.7,"crop":"chickpea","conf":29.5},{"N":53,"P":67,"K":29,"temperature":38.7,"humidity":79.0,"ph":5.9,"rainfall":222.6,"crop":"banana","conf":17.5},{"N":16,"P":51,"K":94,"temperature":31.2,"humidity":84.6,"ph":5.0,"rainfall":149.8,"crop":"banana","conf":26.5},{"N":81,"P":47,"K":39,"temperature":24.0,"humidity":80.3,"ph":6.7,"rainfall":177.6,"crop":"maize","conf":42.5},{"N":48,"P":51,"K":20,"temperature":28.0,"humidity":84.1,"ph":5.6,"rainfall":93.0,"crop":"mothbeans","conf":34.5},{"N":37,"P":55,"K":41,"temperature":40.8,"humidity":86.9,"ph":5.5,"rainfall":185.1,"crop":"kidneybeans","conf":18.0},{"N":88,"P":34,"K":197,"temperature":28.7,"humidity":71.0,"ph":7.2,"rainfall":152.2,"crop":"lentil","conf":32.5},{"N":31,"P":54,"K":105,"temperature":40.5,"humidity":60.7,"ph":6.1,"rainfall":205.7,"crop":"maize","conf":24.5},{"N":61,"P":73,"K":70,"temperature":25.1,"humidity":88.2,"ph":6.1,"rainfall":160.1,"crop":"maize","conf":20.0},{"N":27,"P":44,"K":47,"temperature":36.4,"humidity":80.2,"ph":6.4,"rainfall":80.6,"crop":"blackgram","conf":23.5},{"N":90,"P":73,"K":138,"temperature":20.2,"humidity":74.9,"ph":7.9,"rainfall":181.4,"crop":"lentil","conf":38.5},{"N":51,"P":42,"K":179,"temperature":41.6,"humidity":59.8,"ph":7.6,"rainfall":50.5,"crop":"blackgram","conf":30.5},{"N":32,"P":50,"K":152,"temperature":39.4,"humidity":83.4,"ph":6.1,"rainfall":234.1,"crop":"lentil","conf":43.0},{"N":45,"P":43,"K":190,"temperature":39.8,"humidity":78.8,"ph":4.6,"rainfall":246.0,"crop":"lentil","conf":44.0},{"N":39,"P":59,"K":105,"temperature":20.8,"humidity":89.4,"ph":7.6,"rainfall":238.1,"crop":"pigeonpeas","conf":27.0},{"N":8,"P":51,"K":92,"temperature":24.8,"humidity":60.4,"ph":6.3,"rainfall":94.7,"crop":"chickpea","conf":25.0},{"N":13,"P":51,"K":180,"temperature":31.0,"humidity":84.7,"ph":7.7,"rainfall":112.4,"crop":"lentil","conf":42.5},{"N":56,"P":48,"K":163,"temperature":33.1,"humidity":61.3,"ph":6.9,"rainfall":139.2,"crop":"lentil","conf":40.5},{"N":75,"P":54,"K":53,"temperature":31.4,"humidity":67.0,"ph":6.7,"rainfall":233.0,"crop":"maize","conf":50.0},{"N":27,"P":55,"K":143,"temperature":34.7,"humidity":67.7,"ph":6.8,"rainfall":55.7,"crop":"lentil","conf":37.0},{"N":38,"P":34,"K":208,"temperature":29.9,"humidity":90.5,"ph":5.3,"rainfall":132.4,"crop":"lentil","conf":49.0},{"N":50,"P":25,"K":152,"temperature":41.5,"humidity":82.5,"ph":4.8,"rainfall":286.8,"crop":"lentil","conf":35.0},{"N":85,"P":50,"K":19,"temperature":26.7,"humidity":59.6,"ph":4.5,"rainfall":110.3,"crop":"chickpea","conf":28.0},{"N":81,"P":69,"K":92,"temperature":35.5,"humidity":64.1,"ph":7.1,"rainfall":114.9,"crop":"maize","conf":33.0}];
+
+var tips = {
+  "rice":"Grows best in flooded fields. Needs high humidity and warm temps.",
+  "maize":"Needs well-drained soil. Sensitive to waterlogging.",
+  "chickpea":"Drought-tolerant. Grows well in dry cool conditions.",
+  "kidneybeans":"Needs moderate rainfall. Avoid waterlogged soil.",
+  "pigeonpeas":"Drought-resistant. Grows in semi-arid regions.",
+  "mothbeans":"Very drought-tolerant. Ideal for arid zones.",
+  "mungbean":"Short-duration crop. Needs warm weather.",
+  "blackgram":"Grows in hot dry weather. Low water requirement.",
+  "lentil":"Cool season crop. Needs well-drained loamy soil.",
+  "banana":"Needs high humidity and fertile soil. Avoid frost.",
+  "pomegranate":"Drought-tolerant once established. Needs full sun."
+};
+
+function dist(a,b){
+  var fields=["N","P","K","temperature","humidity","ph","rainfall"];
+  var weights=[1,1,0.5,2,1.5,3,0.3];
+  var d=0;
+  for(var i=0;i<fields.length;i++){
+    var diff=(a[fields[i]]-b[fields[i]])*weights[i];
+    d+=diff*diff;
+  }
+  return d;
+}
+
+function predict(){
+  var fields=["N","P","K","temperature","humidity","ph","rainfall"];
+  var input={};
+  for(var i=0;i<fields.length;i++){
+    var el=document.getElementById(fields[i]);
+    var v=el.value;
+    if(!v){
+      el.style.borderColor='#e57373';
+      el.style.boxShadow='0 0 0 3px rgba(229,115,115,0.18)';
+      (function(e){setTimeout(function(){e.style.borderColor='';e.style.boxShadow='';},2000);})(el);
+      return;
+    }
+    input[fields[i]]=parseFloat(v);
+  }
+  var dists=samples.map(function(s){return{crop:s.crop,conf:s.conf,d:dist(input,s)};});
+  dists.sort(function(a,b){return a.d-b.d;});
+  var top=dists.slice(0,5);
+  var votes={},confs={};
+  top.forEach(function(t){
+    votes[t.crop]=(votes[t.crop]||0)+1;
+    confs[t.crop]=(confs[t.crop]||0)+t.conf;
+  });
+  var best=Object.keys(votes).sort(function(a,b){return votes[b]-votes[a];})[0];
+  var conf=Math.round(confs[best]/votes[best]);
+  var panel=document.getElementById("result");
+  panel.style.display="block";
+  panel.style.animation="none";
+  setTimeout(function(){panel.style.animation='';},10);
+  document.getElementById("crop-emoji").textContent=cropEmojis[best]||'🌱';
+  document.getElementById("crop-name").textContent=best.charAt(0).toUpperCase()+best.slice(1);
+  document.getElementById("crop-subtitle").textContent="Recommended for your soil & climate conditions";
+  document.getElementById("conf-label").textContent=conf+"%";
+  document.getElementById("conf-bar").style.width="0%";
+  setTimeout(function(){document.getElementById("conf-bar").style.width=conf+"%";},100);
+  document.getElementById("tip-text").textContent=tips[best]||"Good growing conditions detected.";
+  setTimeout(function(){panel.scrollIntoView({behavior:'smooth',block:'nearest'});},200);
+}
+
+document.addEventListener('keydown',function(e){if(e.key==='Enter')predict();});
+</script>
+</body>
+</html>
